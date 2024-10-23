@@ -17,4 +17,6 @@ class FetchMode
 
     /** @link PDO::FETCH_COLUMN */
     public const COLUMN = 7;
+
+    public const OBJECT = \PDO::FETCH_OBJ;
 }
