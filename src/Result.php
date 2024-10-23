@@ -58,6 +58,15 @@ class Result
         }
     }
 
+    public function fetchObject()
+    {
+	try {
+		return (object)$this->fetchAssociative();
+	} catch (DriverException $e) {
+		throw $this->connection->convertException($e);
+	}
+    }
+
     /**
      * Returns the first value of the next row of the result or FALSE if there are no more rows.
      *
@@ -104,6 +113,15 @@ class Result
         } catch (DriverException $e) {
             throw $this->connection->convertException($e);
         }
+    }
+
+    public function fetchAllObject(): array
+    {
+	try {
+		return array_map(function ($item) { return (object)$item; }, $this->fetchAllAssociative());
+	} catch (DriverException $e) {
+		throw $this->connection->convertException($e);
+	}
     }
 
     /**
@@ -295,6 +313,10 @@ class Result
             return $this->fetchOne();
         }
 
+	if ($mode === FetchMode::OBJECT) {
+		return $this->fetchObject();
+	}
+
         throw new LogicException('Only fetch modes declared on Doctrine\DBAL\FetchMode are supported by legacy API.');
     }
 
@@ -333,6 +355,10 @@ class Result
         if ($mode === FetchMode::COLUMN) {
             return $this->fetchFirstColumn();
         }
+
+	if ($mode === FetchMode::OBJECT) {
+		return $this->fetchAllObject();
+	}
 
         throw new LogicException('Only fetch modes declared on Doctrine\DBAL\FetchMode are supported by legacy API.');
     }
